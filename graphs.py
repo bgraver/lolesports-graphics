@@ -15,16 +15,18 @@ def teamGoldLine(window, gameNumber=1):
 
     plt.style.use('seaborn-poster')
     plt.style.use('ggplot')
-    plot = sns.lineplot(data=gold_df['gold_diff'])
-    plot.set(xlabel="frames", ylabel="gold", title="Team Gold Difference - {2} - {0} vs. {1} -Game {3}".format(window['gameMetadata']['blueTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['gameMetadata']['redTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['frames'][0]['rfc460Timestamp'].split("T")[0], gameNumber))
+    teamGoldPlot = sns.lineplot(data=gold_df['gold_diff'])
+    teamGoldPlot.set(xlabel="frames", ylabel="gold", title="Team Gold Difference - {2} - {0} vs. {1} -Game {3}".format(window['gameMetadata']['blueTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['gameMetadata']['redTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['frames'][0]['rfc460Timestamp'].split("T")[0], gameNumber))
     size = gold_df['gold_diff'].count()
     plt.plot([0, size], [0, 0])
 
-    plt.savefig('teamGoldGraph-{0}.png'.format(window['esportsGameId']))
+    plotName = 'teamGoldGraph-{0}.png'.format(window['esportsGameId'])
+    plt.savefig("graphs/{0}".format(plotName))
+    plt.clf()
+    return plotName
 
-    return plot
 
-
+# needs to be fixed (doesn't look right)
 def playerGoldLine(window, gameNumber=1):
     # indiv gold graph over time
     player_gold = {
@@ -66,10 +68,15 @@ def playerGoldLine(window, gameNumber=1):
 
     plt.style.use('seaborn-poster')
     plt.style.use('ggplot')
-    plot = sns.lineplot(data=player_gold_df, dashes=False)
-    plot.set(xlabel="frames", ylabel="gold", title="Player Gold Difference - {2} - {0} vs. {1} - Game {3}".format(window['gameMetadata']['blueTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['gameMetadata']['redTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['frames'][0]['rfc460Timestamp'].split("T")[0], gameNumber))
-    plt.savefig('playerGoldGraph-{0}.png'.format(window['esportsGameId']))
-    return plot
+    
+    playerGoldPlot = sns.lineplot(data=player_gold_df, dashes=False)
+    playerGoldPlot.set(xlabel="frames", ylabel="gold", title="Player Gold Difference - {2} - {0} vs. {1} - Game {3}".format(window['gameMetadata']['blueTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['gameMetadata']['redTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['frames'][0]['rfc460Timestamp'].split("T")[0], gameNumber))
+
+    plotName = 'playerGoldGraph-{0}.png'.format(window['esportsGameId'])
+    plt.savefig("graphs/{0}".format(plotName))
+    plt.clf()
+
+    return plotName
 
 
 def kpBar(window, gameNumber=1):
@@ -144,10 +151,13 @@ def kpBar(window, gameNumber=1):
 
     plt.style.use('seaborn-poster')
     plt.style.use('ggplot')
-    plot = sns.barplot(data=kp_df)
-    plot.set(xlabel="Kill Participation", ylabel="% KP", title="Kill Participation - {0} - {1} vs. {2} - Game {3}".format(window['frames'][0]['rfc460Timestamp'].split("T")[0], window['gameMetadata']['blueTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['gameMetadata']['redTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], gameNumber))
-    plot.set_xticklabels(plot.get_xticklabels(), rotation=45, size=4)
+    
+    kpPlot = sns.barplot(data=kp_df)
+    kpPlot.set(xlabel="Kill Participation", ylabel="% KP", title="Kill Participation - {0} - {1} vs. {2} - Game {3}".format(window['frames'][0]['rfc460Timestamp'].split("T")[0], window['gameMetadata']['blueTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], window['gameMetadata']['redTeamMetadata']['participantMetadata'][0]['summonerName'].split(" ")[0], gameNumber))
+    kpPlot.set_xticklabels(kpPlot.get_xticklabels(), rotation=45, size=7)
 
-    plt.savefig("KPGraph - {0}".format(window['esportsGameId']))
+    plotName = "KPGraph-{0}".format(window['esportsGameId'])
+    plt.savefig("graphs/{0}".format(plotName))
+    plt.clf()
 
-    return plot
+    return plotName

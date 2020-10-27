@@ -3,22 +3,25 @@ import requests
 import datetime
 
 
+headers = {'x-api-key': '0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z'}
+params = {"hl": "en-US"}
 
-def getLeagues(headers, params):
+
+def getLeagues():
     return requests.get('https://esports-api.lolesports.com/persisted/gw/getLeagues', params=params, headers=headers).json()
 
 
-def getTournamentFromLeague(headers, params, leagueId):
+def getTournamentFromLeague(leagueId):
     params['leagueId'] = leagueId
     return requests.get('https://esports-api.lolesports.com/persisted/gw/getTournamentsForLeague', params=params, headers=headers).json()
 
 
-def getStandings(headers, params, tournamentId):
+def getStandings(tournamentId):
     params['tournamentId'] = tournamentId
     return requests.get('https://esports-api.lolesports.com/persisted/gw/getStandings', params=params, headers=headers).json()
 
 
-def getSchedule(headers, params, leagueId, pageToken=None):
+def getSchedule(leagueId, pageToken=None):
     params['leagueId'] = leagueId
     if pageToken is not None:
         params['pageToken'] = pageToken
@@ -26,7 +29,7 @@ def getSchedule(headers, params, leagueId, pageToken=None):
 
 
 # datetime format: 2020-09-25T12:43:00Z (YYYY-MM-dd'T'hh-mm-ss'Z')
-def getWindow(headers, params, gameId, startingTime=None):
+def getWindow(gameId, startingTime=None):
     params['gameId'] = gameId
     if startingTime is not None:
         params['startingTime'] = startingTime
@@ -35,10 +38,19 @@ def getWindow(headers, params, gameId, startingTime=None):
     return requests.get("https://feed.lolesports.com/livestats/v1/window/{0}".format(gameId), params=params, headers=headers)
 
 
+def getEventDetails(eventId):
+    params['id'] = eventId
+    return requests.get("https://esports-api.lolesports.com/persisted/gw/getEventDetails", params=params, headers=headers).json()
+
+
+def getCompletedEvents(tournamentId):
+    params['tournamentId'] = tournamentId
+    return requests.get("https://esports-api.lolesports.com/persisted/gw/getCompletedEvents", params=params, headers=headers).json()
+
 # datetime format: 2020-09-25T12:43:00Z (YYYY-MM-dd'T'hh-mm-ss'Z')
-def getFullGameWindow(headers, params, gameId, startingTime):
+def getFullGameWindow(gameId, startingTime):
     master_window = {}
-    window = getWindow(headers, params, gameId, startingTime)
+    window = getWindow(gameId, startingTime)
     start_date = datetime.datetime.strptime(startingTime, '%Y-%m-%dT%H:%M:%SZ')
     formatted_start = ''
     valid_start = False
@@ -51,19 +63,14 @@ def getFullGameWindow(headers, params, gameId, startingTime):
     else:
         valid_start = True
 
-
     # games don't start exactly at the scheduled time
     while valid_start is not True:
         start_date += datetime.timedelta(seconds=10)
         formatted_date = start_date.strftime("%Y-%m-%dT%H:%M:%SZ")
-        window = getWindow(headers, params, gameId, formatted_date)
+        window = getWindow(gameId, formatted_date)
         if window.status_code == 204:
-            # print(window.status_code)
-            # print(start_date)
             pass
         elif window.status_code == 400:
-            # print(window.status_code)
-            # print(start_date)
             break
         else:
             print("ok")
@@ -83,7 +90,7 @@ def getFullGameWindow(headers, params, gameId, startingTime):
     while finished is False:
         current_time += datetime.timedelta(seconds=100)
         formatted_date = current_time.strftime("%Y-%m-%dT%H:%M:%SZ")
-        window = getWindow(headers, params, gameId, formatted_date)
+        window = getWindow(gameId, formatted_date)
         for frame in window.json()['frames']:
             if frame['gameState'] == 'in_game':
                 master_window['frames'].append(frame)

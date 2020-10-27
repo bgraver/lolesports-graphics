@@ -1,3 +1,7 @@
+graphs/
+.ipynb_checkpoints/
+
 *.keys
 *.json
 *.png
+*.ipynb
