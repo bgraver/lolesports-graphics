@@ -3,30 +3,9 @@ import graphs
 import datetime
 import pprint
 import os
-# from bot import leagues_codes
+import json
 
-# window = esports.getFullGameWindow('104841804589544576', '2020-10-18T10:00:00Z')
-
-# leagues = esports.getLeagues()
-# pprint.pprint(leagues)
-
-# tournament = esports.getTournamentFromLeague('98767991299243165')
-# pprint.pprint(tournament)
-
-# start_dates = [datetime.datetime.strptime(date['startDate'], "%Y-%m-%d") for date in tournament['data']['leagues'][0]['tournaments']]
-# pprint.pprint(sorted(start_dates, reverse=True)[0])
-
-# schedule = esports.getSchedule('98767975604431411')
-# pprint.pprint(schedule)
-
-# graphs.kpBar(window)
-# graphs.teamGoldLine(window)
-# graphs.playerGoldLine(window)
-
-'''
-def generateATournament(tournamentId):
-'''
-
+# 3252 games total
 def generateGraphFileStructure():
     # starting in the root
     # making the top level 'graphs' folder
@@ -45,7 +24,6 @@ def generateGraphFileStructure():
         if os.path.isdir(name):
             pass
         else:
-            print(name)
             os.mkdir(name)
         tournaments = esports.getTournamentFromLeague(league['id'])['data']['leagues'][0]['tournaments']
         for tournament in tournaments:
@@ -55,21 +33,19 @@ def generateGraphFileStructure():
             else:
                 os.mkdir(tourney_name)
             events = esports.getCompletedEvents(tournament['id'])['data']['schedule']['events']
-            '''
-             for event in events:
+            for event in events:
                 event_name = "{0}/{1}".format(tourney_name, event['blockName'])
                 if os.path.isdir(event_name):
                     pass
                 else:
                     print(event_name)
                     os.mkdir(event_name)
-            '''
+                matches = esports.getEventDetails(event['match']['id'])
+                for game in matches['data']['event']['match']['games']:
 
-        # print("---")
-    # work through each league and generate the tournament folders
+                    # enter the graphs you want to generate here
 
 
 generateGraphFileStructure()
-
-# events = esports.getCompletedEvents('104174992692075107')
-# pprint.pprint(events['data']['schedule']['events'])
+# match = esports.getEventDetails('104174992730350834')['data']['event']['match']['games']
+# pprint.pprint(match)

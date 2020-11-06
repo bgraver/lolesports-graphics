@@ -1,5 +1,7 @@
 graphs/
 .ipynb_checkpoints/
+__pycache__/
+.idea/
 
 *.keys
 *.json
