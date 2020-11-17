@@ -41,11 +41,12 @@ def generateGraphFileStructure():
                     print(event_name)
                     os.mkdir(event_name)
                 matches = esports.getEventDetails(event['match']['id'])
-                for game in matches['data']['event']['match']['games']:
+                # for game in matches['data']['event']['match']['games']:
 
                     # enter the graphs you want to generate here
 
 
-generateGraphFileStructure()
+# generateGraphFileStructure()
 # match = esports.getEventDetails('104174992730350834')['data']['event']['match']['games']
 # pprint.pprint(match)
+
