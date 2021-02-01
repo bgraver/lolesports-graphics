@@ -6,6 +6,7 @@ import datetime
 headers = {'x-api-key': '0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z'}
 params = {"hl": "en-US"}
 
+s10_start_date = "2021-01-01"
 
 def getLeagues():
     return requests.get('https://esports-api.lolesports.com/persisted/gw/getLeagues', params=params, headers=headers).json()
@@ -27,9 +28,10 @@ def getSchedule(leagueId, pageToken=None):
         params['pageToken'] = pageToken
     return requests.get('https://esports-api.lolesports.com/persisted/gw/getSchedule', params=params, headers=headers).json()
 
-def getFullSchedule(leagueId):
+def getFullSchedule(leagueId, current=True):
     data = getSchedule(leagueId)
     if "errors" in data:
+        print("getFullScheduleError")
         return leagueId
     else:
         pageTokens = []
@@ -45,7 +47,14 @@ def getFullSchedule(leagueId):
         pageTokens.append(pageToken)
         # sort the full_schedule here with a list comprehension
         ordered_schedule = sorted(full_schedule, key=lambda k: datetime.datetime.strptime(k['startTime'], "%Y-%m-%dT%H:%M:%SZ"))
-        return ordered_schedule
+        if current is False:
+            return ordered_schedule
+        else:
+            current_schedule = []
+            for match in ordered_schedule:
+                if match['startTime'] >= s10_start_date:
+                    current_schedule.append(match)
+            return current_schedule
 
 # datetime format: 2020-09-25T12:43:00Z (YYYY-MM-dd'T'hh-mm-ss'Z')
 def getWindow(gameId, startingTime=None):
@@ -57,8 +66,8 @@ def getWindow(gameId, startingTime=None):
     return requests.get("https://feed.lolesports.com/livestats/v1/window/{0}".format(gameId), params=params, headers=headers)
 
 
-def getEventDetails(eventId):
-    params['id'] = eventId
+def getEventDetails(matchId):
+    params['id'] = matchId
     return requests.get("https://esports-api.lolesports.com/persisted/gw/getEventDetails", params=params, headers=headers).json()
 
 
@@ -84,7 +93,7 @@ def getFullGameWindow(gameId, startingTime):
 
     # games don't start exactly at the scheduled time
     while valid_start is not True:
-        start_date += datetime.timedelta(seconds=10)
+        start_date += datetime.timedelta(seconds=20)
         print(start_date)
         formatted_date = start_date.strftime("%Y-%m-%dT%H:%M:%SZ")
         window = getWindow(gameId, formatted_date)
@@ -120,4 +129,12 @@ def getFullGameWindow(gameId, startingTime):
                 finished = True
 
     return master_window
+
+
+def getTeams(teamId):
+    params['id'] = teamId
+    return requests.get('https://esports-api.lolesports.com/persisted/gw/getTeams', params = params, headers = headers).json()['data']['teams']
+
+def getAllTeams():
+    return requests.get('https://esports-api.lolesports.com/persisted/gw/getTeams', params = params, headers = headers).json()['data']['teams']
 
